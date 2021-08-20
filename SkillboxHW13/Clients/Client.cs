@@ -10,17 +10,38 @@ namespace SkillboxHW13
     {
         public List<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
 
-        public void OpenDebet()
+        public void OpenDebet( Client client)
         {
-
+            switch (client)
+            {
+                case RegularClient: break; 
+                case VIPClient: break; 
+                case EntityClient: break; 
+                default:
+                    break;
+            }
         }
-        public void OpenCredit()
+        public void OpenCredit(Client client)
         {
-
+            switch (client)
+            {
+                case RegularClient: break;
+                case VIPClient: break;
+                case EntityClient: break;
+                default:
+                    break;
+            }
         }
-        public void OpenDeposit()
+        public void OpenDeposit(Client client)
         {
-
+            switch (client)
+            {
+                case RegularClient: break;
+                case VIPClient: break;
+                case EntityClient: break;
+                default:
+                    break;
+            }
         }
         public void CloseDebet()
         {

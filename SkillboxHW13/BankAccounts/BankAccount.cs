@@ -8,7 +8,11 @@ namespace SkillboxHW13
 {
     public abstract class BankAccount
     {
-        public double Count { get; protected set; }
+        public double Count { get; protected set; } = 0;
+        public DateTime Opened { get; protected set; }
+        protected static int CommonId { get; set; } = 0;
+
+        public  int Id { get; protected set; }
 
     }
 }

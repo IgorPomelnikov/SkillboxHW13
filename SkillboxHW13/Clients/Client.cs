@@ -10,29 +10,19 @@ namespace SkillboxHW13
     {
         public List<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
 
-        public void OpenDebet( Client client)
+        public double Percent { get; protected set; }
+        protected void OpenCredit(Client client, double sum, int mounths)
         {
             switch (client)
             {
-                case RegularClient: break; 
-                case VIPClient: break; 
-                case EntityClient: break; 
+                case RegularClient: this.AddCredit(sum, client.Percent, mounths); break;
+                case VIPClient: this.AddCredit(sum, client.Percent, mounths); break;
+                case EntityClient: this.AddCredit(sum, client.Percent, mounths); break;
                 default:
                     break;
             }
         }
-        public void OpenCredit(Client client)
-        {
-            switch (client)
-            {
-                case RegularClient: break;
-                case VIPClient: break;
-                case EntityClient: break;
-                default:
-                    break;
-            }
-        }
-        public void OpenDeposit(Client client)
+        protected void OpenDeposit(Client client)
         {
             switch (client)
             {
@@ -43,12 +33,20 @@ namespace SkillboxHW13
                     break;
             }
         }
-        public void CloseDebet()
-        {
 
-        }
-        public void CloseCredit()
+        private void AddCredit(double sum, double percent, int mounth)
         {
+            Credit credit = new(sum, percent, mounth);
+            BankAccounts.Add(credit);
+        }
+        public void CloseAccouint(int id)
+        {
+            int index = BankAccounts.IndexOf(BankAccounts.Find(BankAccounts => BankAccounts.Id == id));
+            if (BankAccounts[index].Count != 0 && BankAccounts[index] is not null)
+            {
+                BankAccounts.RemoveAt(index);
+            }
+
 
         }
         public void CloseDeposit()

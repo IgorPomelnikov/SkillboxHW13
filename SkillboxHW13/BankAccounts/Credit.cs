@@ -8,7 +8,20 @@ namespace SkillboxHW13
 {
     public class Credit : BankAccount
     {
-        //метод выдачи кредита, который принимает желаемую сумму, возвращает ее с процентами для записи в аккаунт.
-        //продумать как будет представлен график платежей и логику погашения задолженности
+        public double Payment { get; private set; }
+        public Credit(double credit, double percents, int mounths)
+        {
+            Payment = credit * (percents * 100 / (12 * 10000)) / (1 - Math.Pow((1 + (percents * 100 / (12 * 10000))), -Convert.ToDouble(mounths))); 
+            //формула аннуитетного платежа https://ru.wikipedia.org/wiki/%D0%90%D0%BD%D0%BD%D1%83%D0%B8%D1%82%D0%B5%D1%82
+            //аннуитетный платёж умножаю на количество месяцев
+            Count = Payment * mounths;
+            Opened = DateTime.Now;
+            Id = CommonId++;
+        }
+
+        public void MakePayment(double payment)
+        {
+            Count -= payment;
+        }
     }
 }

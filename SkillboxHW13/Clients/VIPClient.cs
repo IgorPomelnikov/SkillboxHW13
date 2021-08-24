@@ -10,7 +10,9 @@ namespace SkillboxHW13
     {
         public VIPClient()
         {
-            Percent = 5;
+            CreditPercent = 5;
+            DepositPercent = 15;
+            Id = CommonId++;
         }
         public void OpenCredit(double sum, int mounths)
         {

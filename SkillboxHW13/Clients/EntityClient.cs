@@ -10,7 +10,9 @@ namespace SkillboxHW13
     {
         public EntityClient()
         {
-            Percent = 20;
+            CreditPercent = 20;
+            DepositPercent = 5;
+            Id = CommonId++;
         }
         
         public void OpenCredit(double sum, int mounths)

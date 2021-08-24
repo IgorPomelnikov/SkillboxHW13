@@ -10,7 +10,9 @@ namespace SkillboxHW13
     {
         public RegularClient()
         {
-            Percent = 10;
+            CreditPercent = 10;
+            DepositPercent = 10;
+            Id = CommonId++;
         }
         public void OpenCredit(double sum, int mounths)
         {

@@ -8,6 +8,6 @@ namespace SkillboxHW13
 {
     public class Bank
     {
-        public List<Client> Clients { get; set; }
+        public List<Client> Clients { get; set; } = new List<Client>();
     }
 }

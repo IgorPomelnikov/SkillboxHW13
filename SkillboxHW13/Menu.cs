@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SkillboxHW13.BankAccounts
+namespace SkillboxHW13
 {
     public class Menu
     {
@@ -18,7 +18,7 @@ namespace SkillboxHW13.BankAccounts
             switch (number.Key)
             {
                 case ConsoleKey.D1: manager.RegisterClient(); break;
-                case ConsoleKey.D2:  2;
+                case ConsoleKey.D2: PrintAllClients(bank); GetIdFromConsole();  break;
                 default: Console.Write("\b"); break;
             }
         }
@@ -43,12 +43,27 @@ namespace SkillboxHW13.BankAccounts
         }
         int GetIdFromConsole()
         {
+            bool condition = true;
             List<char> id = new List<char>();
-            ConsoleKeyInfo number = Console.ReadKey();
-            switch (number)
+            do
             {
-                case '1': break;
-            }
+                ConsoleKeyInfo kay = Console.ReadKey();
+
+                char number = kay.KeyChar;
+                if (char.IsNumber(number))
+                {
+                    id.Add(number);
+                }
+                else Console.Write("\b \b");
+                if (kay.Key == ConsoleKey.Enter)
+                {
+                    condition = false;
+                }
+
+            } while (condition);
+            
+            string s  = ();
+            return 1;
         }
     }
 }

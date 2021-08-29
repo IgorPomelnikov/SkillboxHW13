@@ -15,27 +15,14 @@ namespace SkillboxHW13
 
         public double DepositPercent { get; protected set; }
         public double CreditPercent { get; protected set; }
-        protected void OpenCreditAccount(Client client, double sum, int mounths)
+        public void OpenCreditAccount(Client client, double sum, int mounths)
         {
-            switch (client)
-            {
-                case RegularClient: this.AddCredit(sum, client.CreditPercent, mounths); break;
-                case VIPClient: this.AddCredit(sum, client.CreditPercent, mounths); break;
-                case EntityClient: this.AddCredit(sum, client.CreditPercent, mounths); break;
-                default:
-                    break;
-            }
+             this.AddCredit(sum, client.CreditPercent, mounths);
         }
-        protected void OpenDepositAccount(Client client, double sum, int mounth, bool capitalized)
+        public void OpenDepositAccount(Client client, double sum, int mounth, bool capitalized)
         {
-            switch (client)
-            {
-                case RegularClient: this.AddDeposit(sum, client.DepositPercent, mounth, capitalized); break;
-                case VIPClient: this.AddDeposit(sum, client.DepositPercent, mounth, capitalized); break;
-                case EntityClient: this.AddDeposit(sum, client.DepositPercent, mounth, capitalized); break;
-                default:
-                    break;
-            }
+            this.AddDeposit(sum, client.DepositPercent, mounth, capitalized);
+           
         }
         private void AddDeposit(double sum, double percent, int mounth, bool capitalized)
         {
@@ -50,7 +37,7 @@ namespace SkillboxHW13
         public void CloseBankAccount(int id)
         {
             int index = BankAccounts.IndexOf(BankAccounts.Find(BankAccounts => BankAccounts.Id == id));
-            if (BankAccounts[index].Count != 0 && BankAccounts[index] is not null)
+            if (BankAccounts[index].Balance != 0 && BankAccounts[index] is not null)
             {
                 BankAccounts.RemoveAt(index);
             }

@@ -20,9 +20,29 @@ namespace SkillboxHW13
             Console.Clear();
             Console.WriteLine("You've created client {0}", _bank.Clients[^1].Id);
         }
-        public void DeleteClient()
-        {
 
+        public void OpenNewAccount(Client client, int accountType)
+        {
+            switch (accountType)
+            {
+                case 1:
+                    {
+                        client.OpenCreditAccount(client, Menu.OpenPageMoney(), Menu.OpenPageMounths()); 
+                        break;
+                    }
+                case 2: client.OpenDepositAccount(client, Menu.OpenPageMoney(), Menu.OpenPageMounths(), Menu.OpenPageCapitalization()); break;
+                default:
+                    break;
+            }
+        }
+        public void RemoveBankAccount(Client client, BankAccount bankAccount)
+        {
+            if (bankAccount.Balance == 0 || bankAccount is null)
+            {
+                client.BankAccounts.Remove(bankAccount);
+            }
+            else Menu.OpenPageWarning("Balance must be equal 0");
+            
         }
 
         int GetClientType()
@@ -60,8 +80,34 @@ namespace SkillboxHW13
                 default: return null;
             }
         }
+        
 
         /* добавить метод выбора действия с клиентом
+         * Какие действия могут быть?
+         * создать клиента - done
+         * удалить клиента 
+         * открыть счёт
+         * закрыть счёт
+         * посмотреть остаток кредита
+         * посмотреть счёт депозита
+         * 
+         * внести деньги на счёт\
+         *                       |>----выполнить перевод со счёта на счёт                       
+         * снять деньги со счёта/
+         * 
+         *
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
          * добавить метод вывода в консоль данных по счетам клиента
          * добавить метод просмотра состояния кредита по дате, где будет выбор посмотреть по текущей дате или установить дату вручную для просмотра.
          * добавить метод внесения платежей

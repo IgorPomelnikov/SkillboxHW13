@@ -15,9 +15,13 @@ namespace SkillboxHW13
             Id = CommonId++;
         }
         
-        public void OpenCredit(double sum, int mounths)
+        public void OpenCreditAccount(double sum, int mounths)
         {
-            base.OpenCredit(this, sum, mounths);
+            base.OpenCreditAccount(this, sum, mounths);
+        } 
+        public void OpenDepositAccount(double sum, int mounths, bool capitalized)
+        {
+            base.OpenDepositAccount(this, sum, mounths, capitalized);
         }
     }
 }

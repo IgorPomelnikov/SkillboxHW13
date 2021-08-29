@@ -15,7 +15,7 @@ namespace SkillboxHW13
 
         public double DepositPercent { get; protected set; }
         public double CreditPercent { get; protected set; }
-        protected void OpenCredit(Client client, double sum, int mounths)
+        protected void OpenCreditAccount(Client client, double sum, int mounths)
         {
             switch (client)
             {
@@ -26,7 +26,7 @@ namespace SkillboxHW13
                     break;
             }
         }
-        protected void OpenDeposit(Client client, double sum, int mounth, bool capitalized)
+        protected void OpenDepositAccount(Client client, double sum, int mounth, bool capitalized)
         {
             switch (client)
             {

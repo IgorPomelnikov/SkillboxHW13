@@ -11,15 +11,26 @@ namespace SkillboxHW13
         public Menu(Bank bank, Manager manager)
         {
             Welcome();
-            Console.WriteLine("What would you like to do?\n"+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("What would you like to do?\n" +
                               "1) Register a new client\n" +
                               "2) Choose a client ");
-            ConsoleKeyInfo number = Console.ReadKey(true);
-            switch (number.Key)
-            {
-                case ConsoleKey.D1: manager.RegisterClient(); break;
-                case ConsoleKey.D2: PrintAllClients(bank); GetIdFromConsole();  break;
-                default: Console.Write("\b"); break;
+                ConsoleKeyInfo number = Console.ReadKey(true);
+                switch (number.Key)
+                {
+                    case ConsoleKey.D1: manager.RegisterClient(); break;
+                    case ConsoleKey.D2:
+                        Console.Clear();
+                        PrintAllClients(bank);
+                        Console.Write("Write client's id and press Enter: ");
+                        int id = GetIdFromConsole();
+                        manager.ChooseCliehtById(id);
+                        break;
+                    default: Console.Write("\b"); break;
+                }
+
             }
         }
 
@@ -54,16 +65,16 @@ namespace SkillboxHW13
                 {
                     id.Add(number);
                 }
-                else Console.Write("\b \b");
-                if (kay.Key == ConsoleKey.Enter)
+                else if (kay.Key == ConsoleKey.Enter)
                 {
                     condition = false;
                 }
+                else Console.Write("\b \b");
 
             } while (condition);
             
-            string s  = ();
-            return 1;
+            string s  = new(id.ToArray());
+            return int.Parse(s);
         }
     }
 }

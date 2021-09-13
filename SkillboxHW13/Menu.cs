@@ -14,7 +14,7 @@ namespace SkillboxHW13
         Manager manager;
         Client currientClient;
         Random random = new Random();
-        public event MenuEvent menuEvent;
+        public event Action<object, string> menuEvent;
 
         public Menu(Bank bank, Manager manager)
         {
@@ -25,7 +25,7 @@ namespace SkillboxHW13
             manager.SetClientTypeGetter(OpenPageGetClientType);
             manager.SetCapitalizationGetter(OpenPageCapitalization);
             manager.SetNameGetter(GetRandomName);
-            manager.NewMassage += OpenPageWarning;
+            manager.messageFromManager += OpenPageWarning;
         }
 
         #region Страницы меню

@@ -8,13 +8,16 @@ namespace SkillboxHW13
 {
     public abstract class Client
     {
-        public event AccountEvent BankAccountStatus;
-        public int Id { get; protected set; }
         protected static int CommonId { get; set; } = 0;
-        public List<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
+
+        public int Id { get; protected set; }
         public string Name { get; protected set; }
         public double DepositPercent { get; protected set; }
         public double CreditPercent { get; protected set; }
+        public List<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
+        
+        public event Action<object, string> bankAccountStatus;
+
         /// <summary>
         /// Открывает депозитный счёт и заносит новый бансковский счёт в  в коллекцию счетов клиента.
         /// </summary>
@@ -26,7 +29,7 @@ namespace SkillboxHW13
         {
             Deposit deposit = new(sum, percent, mounth, capitalized);
             BankAccounts.Add(deposit);
-            BankAccountStatus(this, $"New Credit (id {deposit.Id}) was created for client {Name} (id {Id})");
+            bankAccountStatus(this, $"New Credit (id {deposit.Id}) was created for client {Name} (id {Id})");
         }
         /// <summary>
         /// Открывает кредитный счёт и заносит новый бансковский счёт в коллекцию счетов клиента.
@@ -39,7 +42,7 @@ namespace SkillboxHW13
             Credit credit = new(sum, percent, mounth);
             BankAccounts.Add(credit);
 
-            BankAccountStatus(this, $"New Credit (id {credit.Id}) was created for client {Name} (id {Id})");
+            bankAccountStatus(this, $"New Credit (id {credit.Id}) was created for client {Name} (id {Id})");
         }
         /// <summary>
         /// Открывает кредитный счёт
@@ -75,7 +78,7 @@ namespace SkillboxHW13
             {
                 BankAccounts.RemoveAt(index);
             }
-            BankAccountStatus(this, $"Bank account Id_{id} of client {Name} (id {Id}) was closed");
+            bankAccountStatus(this, $"Bank account Id_{id} of client {Name} (id {Id}) was closed");
         }
         /// <summary>
         /// Переводит деньги с одного счёта на другой
@@ -94,9 +97,9 @@ namespace SkillboxHW13
                         BankAccounts[index].TakeMoney(count);
                         BankAccounts[index2].MakePayment(count);
                     }
-                    else BankAccountStatus(this, $"A broblem with bank account id {toId}");
+                    else bankAccountStatus(this, $"A broblem with bank account id {toId}");
             }
-            else BankAccountStatus(this, $"A broblem with bank account id {fromId}");
+            else bankAccountStatus(this, $"A broblem with bank account id {fromId}");
         }
 
        

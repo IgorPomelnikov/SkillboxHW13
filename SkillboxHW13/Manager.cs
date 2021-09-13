@@ -11,23 +11,23 @@ namespace SkillboxHW13
     {
         public string Name { get; private set; }
 
-        public event Notify NewMassage;
-        private Bank _bank;
-        private IntGetter money;
-        private IntGetter mouths;
-        private IntGetter clientType;
-        private BoolGetter capitalization;
-        private StringGetter name;
+        Bank _bank;
+        Func<int> getMoneyValueFromUser;
+        Func<int> getMouthsValueFromUser;
+        Func<int> getClientTypeFromUser;
+        Func<bool> getCapitalizationValueFromUser;
+        Func<string> getNameValueFromUser;
+        public event Action<string> messageFromManager;
 
         
         Client CreateClient()
         {
             
-            switch (clientType())
+            switch (getClientTypeFromUser())
             {
-                case 1: return new RegularClient(name());
-                case 2: return new VIPClient(name());
-                case 3: return new EntityClient(name());
+                case 1: return new RegularClient(getNameValueFromUser());
+                case 2: return new VIPClient(getNameValueFromUser());
+                case 3: return new EntityClient(getNameValueFromUser());
                 default: return null;
             }
         }
@@ -35,33 +35,34 @@ namespace SkillboxHW13
         {
             _bank = bank;
         }
+       
         #region Методы присвоения ссылок делегатам
 
         /// <summary>
         /// Сохраняет ссылку на внешний метод получения денежной суммы
         /// </summary>
         /// <param name="intPage">Внешний метод</param>
-        public void SetMoneyGetter(IntGetter intPage) { money = intPage; }
+        public void SetMoneyGetter(Func<int> intPage) { getMoneyValueFromUser = intPage; }
         /// <summary>
         /// Сохраняет ссылку на внешний метод получения количества месяцев
         /// </summary>
         /// <param name="intPage">Внешний метод</param>
-        public void SetMounthsGetter(IntGetter intPage) { mouths = intPage; }
+        public void SetMounthsGetter(Func<int> intPage) { getMouthsValueFromUser = intPage; }
         /// <summary>
         /// Сохраняет ссылку на внешний метод получения типа клиента в виде целочисленного значения для использования в качестве swich переключателя
         /// </summary>
         /// <param name="intPage">Внешний метод</param>
-        public void SetClientTypeGetter(IntGetter intPage) { clientType = intPage; }
+        public void SetClientTypeGetter(Func<int> intPage) { getClientTypeFromUser = intPage; }
         /// <summary>
         /// Сохраняет ссылку на внешний метод получения информации о типе депозита
         /// </summary>
         /// <param name="intPage">Внешний метод</param>
-        public void SetCapitalizationGetter(BoolGetter boolPage) { capitalization = boolPage; }
+        public void SetCapitalizationGetter(Func<bool> boolPage) { getCapitalizationValueFromUser = boolPage; }
         /// <summary>
         /// Сохраняет ссылку на внешний метод получения имени клиента
         /// </summary>
         /// <param name="intPage">Внешний метод</param>
-        public void SetNameGetter(StringGetter stringPage) { name = stringPage; }
+        public void SetNameGetter(Func<string> stringPage) { getNameValueFromUser = stringPage; }
         #endregion
 
 
@@ -72,7 +73,7 @@ namespace SkillboxHW13
         {
             _bank.Clients.Add(CreateClient());
             
-            NewMassage($"Manager {Name} created client {_bank.Clients[^1].Id}");
+            messageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id}");
         }
         /// <summary>
         /// Открывает клиенту новый банковский счёт
@@ -85,10 +86,10 @@ namespace SkillboxHW13
             {
                 case 1:
                     {
-                        client.OpenCreditAccount(client, money(), mouths()); 
+                        client.OpenCreditAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser()); 
                         break;
                     }
-                case 2: client.OpenDepositAccount(client, money(), mouths(), capitalization()); break;
+                case 2: client.OpenDepositAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser(), getCapitalizationValueFromUser()); break;
                 default:
                     break;
             }
@@ -104,7 +105,7 @@ namespace SkillboxHW13
             {
                 client.BankAccounts.Remove(bankAccount);
             }
-            else NewMassage("Balance must be equal 0");
+            else messageFromManager("Balance must be equal 0");
             
         }
         /// <summary>

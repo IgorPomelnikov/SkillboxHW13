@@ -20,11 +20,13 @@ namespace SkillboxHW13
             Id = CommonId++;
         }
 
-        public void MakePayment(double payment)
+        public override void MakePayment(double payment)
         {
             Balance+= payment;
         }
 
-       
+        public override void TakeMoney(double payment)
+        {
+        }
     }
 }

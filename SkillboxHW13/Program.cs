@@ -10,7 +10,6 @@ namespace SkillboxHW13
             var manager = new Manager(bank);
             var menu = new Menu(bank, manager);
             menu.OpenPageStart();
-
         }
     }
 }

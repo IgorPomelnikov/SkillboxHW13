@@ -21,6 +21,12 @@ namespace SkillboxHW13
             LastUpdate = Opened;
             Id = CommonId++;
         }
+        /// <summary>
+        /// Создаёт расписание начислений процентов по вкладам. У капитализированного надбавка происходит каждый месяц, у простого, только на последнем месяце.
+        /// </summary>
+        /// <param name="capitalized">Является ли депозит капитализированным вкладом False если нет, True если да</param>
+        /// <param name="mounth">Количество месяцев на который открывается депозит</param>
+        /// <returns>Коллекция словарного типа, содержащая в качестве ключа дату и в качестве значения то, какой процент будет на вкладе к этой дате</returns>
         Dictionary<DateTime, double> PaymentSсhedule(bool capitalized, int mounth)
         {
             Dictionary<DateTime, double> schedule = new Dictionary<DateTime, double>();
@@ -43,6 +49,16 @@ namespace SkillboxHW13
                 
             }
             return schedule;
+        }
+
+        public override void MakePayment(double payment)
+        {
+            Balance += payment;
+        }
+
+        public override void TakeMoney(double payment)
+        {
+            Balance -= payment;
         }
 
 

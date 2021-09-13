@@ -8,8 +8,9 @@ namespace SkillboxHW13
 {
     public class EntityClient : Client
     {
-        public EntityClient()
+        public EntityClient(string name)
         {
+            Name = name;
             CreditPercent = 20;
             DepositPercent = 5;
             Id = CommonId++;

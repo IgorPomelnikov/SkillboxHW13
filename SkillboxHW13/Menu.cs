@@ -7,17 +7,140 @@ using System.Threading;
 
 namespace SkillboxHW13
 {
+    
     public class Menu
     {
-        Client currientClient;
-        Manager manager;
         Bank bank;
+        Manager manager;
+        Client currientClient;
+        Random random = new Random();
+        public event MenuEvent menuEvent;
+
         public Menu(Bank bank, Manager manager)
         {
             this.bank = bank;
             this.manager = manager;
+            manager.SetMoneyGetter(OpenPageMoney);
+            manager.SetMounthsGetter(OpenPageMounths);
+            manager.SetClientTypeGetter(OpenPageGetClientType);
+            manager.SetCapitalizationGetter(OpenPageCapitalization);
+            manager.SetNameGetter(GetRandomName);
+            manager.NewMassage += OpenPageWarning;
         }
 
+        #region Страницы меню
+        /// <summary>
+        /// Открывает страницу баланса счёта клиента
+        /// </summary>
+        void OpenPageBalance()
+        {
+            BankAccount bankAccount = OpenPageBankAccounts();
+            Console.Clear();
+            if (bankAccount is not null)
+            {
+                Console.WriteLine($"Balance of account id{bankAccount.Id} is {bankAccount.Balance}\nPress any kay to continue...");
+
+            }
+            else Console.WriteLine("Press any kay to continue...");
+            Console.ReadKey();
+        }
+        /// <summary>
+        /// Открывает траницу выбора действия с клиентом
+        /// </summary>
+        void OpenPageClientAction()
+        {
+            bool condition = true;
+            do
+            {
+
+                Console.Clear();
+                Console.WriteLine("What would you like to do?\n" +
+                                  "1) Look all bank accounts\n" +
+                                  "2) Add new bank account\n" +
+                                  "3) Remove an account\n" +
+                                  "4) Look balance for today\n" +
+                                  "0) Back to previous page");
+                ConsoleKeyInfo number = Console.ReadKey(true);
+                switch (number.Key)
+                {
+                    case ConsoleKey.D1: PrintClientAccounts(); break;
+                    case ConsoleKey.D2: OpenPageCreateAccount(); break;
+                    case ConsoleKey.D3:
+                        {
+                            BankAccount temp = OpenPageBankAccounts();
+                            if (temp is not null)
+                            {
+                                manager.RemoveBankAccount(currientClient, temp); break;
+                            }
+                            else 
+                            {
+                                OpenPageWarning("Chosen account is null");
+                                menuEvent(this, "Chosen account is null");
+                                break;
+                            }
+
+                        } 
+                    case ConsoleKey.D4: OpenPageBalance(); break;
+                    case ConsoleKey.D0: condition = false; break;
+                    default: break;
+                }
+            } while (condition);
+        }
+        /// <summary>
+        /// Открывает страницу содания банковского счёта
+        /// </summary>
+        void OpenPageCreateAccount()
+        {
+            bool condition = true;
+            do
+            {
+
+                Console.Clear();
+                Console.WriteLine("What account would you like to open?\n" +
+                                  "1) Deposit\n" +
+                                  "2) Credit\n" +
+                                  "0) Back to previous page");
+                ConsoleKeyInfo number = Console.ReadKey(true);
+                switch (number.Key)
+                {
+                    case ConsoleKey.D1: manager.OpenNewAccount(currientClient, 1); Success(); break;
+                    case ConsoleKey.D2: manager.OpenNewAccount(currientClient, 2); Success(); break;
+                    case ConsoleKey.D0: condition = false; break;
+                    default: ; break;
+                }
+            } while (condition);
+        }
+        /// <summary>
+        /// Открывает страницу для выбора банковского счёта, печатает список счетов клиента
+        /// </summary>
+        /// <returns>Выбранный банковсий счёт</returns>
+        BankAccount OpenPageBankAccounts()
+        {
+            Console.Clear();
+            if (currientClient.BankAccounts is not null)
+            {
+                PrintClientAccounts();
+            }
+            else
+            {
+                Console.WriteLine("This client has no bank accounts");
+                return null;
+            }
+            Console.Write("\n\nType id of account what you need: ");
+            try
+            {
+                return currientClient.BankAccounts.Find(account => account.Id == GetIntFromConsole());
+            }
+            catch (Exception)
+            {
+                OpenPageWarning("There is no accounts with this ID!\nTry again...");
+                Thread.Sleep(1000);
+                return OpenPageBankAccounts();
+            }
+        }
+        /// <summary>
+        /// Открывает начальную страницу меню
+        /// </summary>
         public void OpenPageStart()
         {
             while (true)
@@ -44,54 +167,53 @@ namespace SkillboxHW13
 
             }
         }
-
-        private void OpenPageClientAction()
+        /// <summary>
+        /// Открывает страницу для ввода денежной суммы
+        /// </summary>
+        /// <returns>Целое число</returns>
+        public static int OpenPageMoney()
         {
-            bool condition = true;
-            do
+            Console.Clear();
+            Console.Write("Type count of money and press Enter: ");
+            return GetIntFromConsole();
+        }
+        /// <summary>
+        /// Открывает страницу для ввода количества месяцев
+        /// </summary>
+        /// <returns>Целое число</returns>
+        public static int OpenPageMounths()
+        {
+            Console.Clear();
+            Console.Write("Type count of mounths and press Enter: ");
+            return GetIntFromConsole();
+        }
+        /// <summary>
+        /// Открывает страницу выбора типа клиента
+        /// </summary>
+        /// <returns>Возврат числа от 1 до 3 для дальшейшего использования в качестве переключателя swich</returns>
+        public static int OpenPageGetClientType()
+        {
+            Console.Clear();
+            Console.WriteLine("Chose a kind of a client:\n" +
+                              "1) Regular client\n" +
+                              "2) VIP client\n" +
+                              "3) Entity client");
+            while (true)
             {
-
-                Console.Clear();
-                Console.WriteLine("What would you like to do?\n" +
-                                  "1) Look all bank accounts\n" +
-                                  "2) Add new bank account\n" +
-                                  "3) Remove an account\n" +
-                                  "4) Look balance for today\n" +
-                                  "0) Back to previous page");
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: PrintClientAccounts(); break;
-                    case ConsoleKey.D2: OpenPageCreateAccount(); break;
-                    case ConsoleKey.D3: manager.RemoveBankAccount(currientClient, OpenPageBankAccounts()); break;
-                    case ConsoleKey.D4: OpenPageBalance(); break;
-                    case ConsoleKey.D0: condition = false; break;
-                    default: break;
+                    case ConsoleKey.D1: return 1;
+                    case ConsoleKey.D2: return 2;
+                    case ConsoleKey.D3: return 3;
+                    default: Console.Write("\b"); break;
                 }
-            } while (condition);
-        }
-        BankAccount OpenPageBankAccounts()
-        {
-            Console.Clear();
-            PrintClientAccounts();
-            Console.Write("\n\nType id of account what you need: ");
-            try
-            {
-                return currientClient.BankAccounts.Find(account => account.Id == GetIntFromConsole());
-            }
-            catch (Exception)
-            {
-                OpenPageWarning("There is no accounts with this ID!\nTry again...");
-                return OpenPageBankAccounts();
             }
         }
-        void OpenPageBalance()
-        {
-            BankAccount bankAccount = OpenPageBankAccounts();
-            Console.Clear();
-            Console.WriteLine($"Balance of account id{bankAccount.Id} is {bankAccount.Balance}\nPress any kay to continue...");
-            Console.ReadKey();
-        }
+        /// <summary>
+        /// Открывает страницу выбора типа депозита
+        /// </summary>
+        /// <returns>Возврат лочгического значения для дальшейшего использования</returns>
         public static bool OpenPageCapitalization()
         {
             Console.Write("Is deposit capitalized? y/n: ");
@@ -103,62 +225,98 @@ namespace SkillboxHW13
                 default: Console.Write("\b"); return OpenPageCapitalization();
             }
         }
+        /// <summary>
+        /// Открывает страницу для вывода ошибки
+        /// </summary>
+        /// <param name="message">Сообщение ошибки</param>
         public static void OpenPageWarning(string message)
         {
             Console.Clear();
             Console.WriteLine(message);
             Thread.Sleep(3000);
         }
-        private void OpenPageCreateAccount()
-        {
-            bool condition = true;
-            do
-            {
-
-                Console.Clear();
-                Console.WriteLine("What account would you like to open?\n" +
-                                  "1) Deposit\n" +
-                                  "2) Credit\n" +
-                                  "0) Back to previous page");
-                ConsoleKeyInfo number = Console.ReadKey(true);
-                switch (number.Key)
-                {
-                    case ConsoleKey.D1: manager.OpenNewAccount(currientClient, 1); Success(); break;
-                    case ConsoleKey.D2: manager.OpenNewAccount(currientClient, 2); Success(); break;
-                    case ConsoleKey.D0: condition = false; break;
-                    default: ; break;
-                }
-            } while (condition);
-        }
+        /// <summary>
+        /// Дописывает в конце строки сообщение об успесшной работе
+        /// </summary>
         public static void Success()
         {
-            Console.Clear();
             Console.WriteLine("Success!");
             Thread.Sleep(2500);
         }
-        public static int OpenPageMoney()
+        #endregion
+
+        
+        /// <summary>
+        /// Выдаёт одно из имен в списке
+        /// </summary>
+        /// <returns>Случайно выбранное имя</returns>
+        string GetRandomName()
         {
-            Console.Clear();
-            Console.Write("Type count of money and press Enter: ");
-            return GetIntFromConsole();
-        }
-        public static int OpenPageMounths()
-        {
-            Console.Clear();
-            Console.Write("Type count of mounths and press Enter: ");
-            return GetIntFromConsole();
-        }
-        private void PrintClientAccounts()
-        {
-            Console.Clear();
-            foreach (var account in currientClient.BankAccounts)
+            int numerOfRandomName = random.Next(1, 21);
+            switch (numerOfRandomName)
             {
-                Console.WriteLine($"{account.ToString()} - id{account.Id}");
+                case 1: return "Виктория";
+                case 2: return "Пётр";
+                case 3: return "Анна";
+                case 4: return "Алексей";
+                case 5: return "Али";
+                case 6: return "Мария";
+                case 7: return "Глеб";
+                case 8: return "Тамара";
+                case 9: return "Виктор";
+                case 10: return "Евгения";
+                case 11: return "Евгений";
+                case 12: return "Мартина";
+                case 13: return "Антон";
+                case 14: return "Ксения";
+                case 15: return "Георг";
+                case 16: return "Ольга";
+                case 17: return "Максим";
+                case 18: return "Юлия";
+                case 19: return "Сергей";
+                case 20: return "Майя";
+               default: return "";
             }
-            Console.WriteLine("Press any kay to continue...");
-            Console.ReadKey();
         }
-        private Client ChooseClient(Bank bank, Manager manager)
+        /// <summary>
+        /// Выводит в консоль список счетов клиента
+        /// </summary>
+        void PrintClientAccounts()
+        {
+            if (currientClient.BankAccounts is not null)
+            {
+                Console.Clear();
+                foreach (var account in currientClient.BankAccounts)
+                {
+                    Console.WriteLine($"{account.ToString()} - id{account.Id}");
+                }
+                Console.WriteLine("Press any kay to continue...");
+                Console.ReadKey();
+            }
+            else
+            {
+                OpenPageWarning("This client has no bank accounts");
+            }
+            
+        }
+        /// <summary>
+        /// Выводит в консоль всех клиентов данного банка
+        /// </summary>
+        /// <param name="bank">Банк с которым производится работа</param>
+        void PrintAllClients(Bank bank)
+        {
+            foreach (var client in bank.Clients)
+            {
+                Console.WriteLine($"{client.Id}");
+            }
+        }
+        /// <summary>
+        /// Выбирает клиента из всех клиентов банка
+        /// </summary>
+        /// <param name="bank">Банк с которым производится работа</param>
+        /// <param name="manager">Проводящий операцию менеджер</param>
+        /// <returns></returns>
+        Client ChooseClient(Bank bank, Manager manager)
         {
             Client currientClient;
             Console.Clear();
@@ -178,14 +336,10 @@ namespace SkillboxHW13
                 return ChooseClient(bank, manager);
             }
         }
-
-        void PrintAllClients(Bank bank)
-        {
-            foreach (var client in bank.Clients)
-            {
-                Console.WriteLine($"{client.Id}");
-            }
-        }
+        /// <summary>
+        /// Защищает ввод от нерелевантных символов
+        /// </summary>
+        /// <returns>Целое число</returns>
         static int GetIntFromConsole()
         {
             bool condition = true;
@@ -210,5 +364,6 @@ namespace SkillboxHW13
             string s  = new(charCollection.ToArray());
             return int.Parse(s);
         }
+        
     }
 }

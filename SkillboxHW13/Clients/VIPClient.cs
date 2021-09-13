@@ -8,8 +8,9 @@ namespace SkillboxHW13
 {
     public class VIPClient : Client
     {
-        public VIPClient()
+        public VIPClient(string name)
         {
+            Name = name;
             CreditPercent = 5;
             DepositPercent = 15;
             Id = CommonId++;

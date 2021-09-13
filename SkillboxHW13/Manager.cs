@@ -17,7 +17,7 @@ namespace SkillboxHW13
         Func<int> getClientTypeFromUser;
         Func<bool> getCapitalizationValueFromUser;
         Func<string> getNameValueFromUser;
-        public event Action<string> messageFromManager;
+        public event Action<string> sendMessageFromManager;
 
         
         Client CreateClient()

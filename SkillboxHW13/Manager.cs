@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BankAccountLibrary;
+using ClientsLibrary;
+using System;
+
+
 
 namespace SkillboxHW13
 {
@@ -19,10 +19,10 @@ namespace SkillboxHW13
         Func<string> getNameValueFromUser;
         public event Action<string> sendMessageFromManager;
 
-        
+
         Client CreateClient()
         {
-            
+
             switch (getClientTypeFromUser())
             {
                 case 1: return new RegularClient(getNameValueFromUser());
@@ -31,11 +31,9 @@ namespace SkillboxHW13
                 default: return null;
             }
         }
-        public Manager(Bank bank)
-        {
-            _bank = bank;
-        }
-       
+        public Manager(Bank bank) => _bank = bank;
+
+
         #region Методы присвоения ссылок делегатам
 
         /// <summary>
@@ -72,7 +70,6 @@ namespace SkillboxHW13
         public void RegisterClient()
         {
             _bank.Clients.Add(CreateClient());
-
             sendMessageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id}");
         }
         /// <summary>
@@ -80,16 +77,12 @@ namespace SkillboxHW13
         /// </summary>
         /// <param name="client">Клиент, которому открывается счёт</param>
         /// <param name="accountType">Тип открываемого счёта</param>
-        public void OpenNewAccount(Client client, int accountType)
+        public void OpenNewAccount(Client client, BankAccountTypes accountType)
         {
             switch (accountType)
             {
-                case 1:
-                    {
-                        client.OpenCreditAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser()); 
-                        break;
-                    }
-                case 2: client.OpenDepositAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser(), getCapitalizationValueFromUser()); break;
+                case BankAccountTypes.Credit: client.OpenCreditAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser()); break;
+                case BankAccountTypes.Deposit: client.OpenDepositAccount(client, getMoneyValueFromUser(), getMouthsValueFromUser(), getCapitalizationValueFromUser()); break;
                 default:
                     break;
             }
@@ -101,22 +94,19 @@ namespace SkillboxHW13
         /// <param name="bankAccount">Счёт для закрытия</param>
         public void RemoveBankAccount(Client client, BankAccount bankAccount)
         {
-            if (bankAccount.Balance == 0 || bankAccount is null)
+            if (bankAccount is not null && bankAccount.Balance == 0)
             {
                 client.BankAccounts.Remove(bankAccount);
             }
             else sendMessageFromManager("Balance must be equal 0");
-            
         }
         /// <summary>
         /// Выбирает клиента из коллекци клиентов банка
         /// </summary>
         /// <param name="id">Id клиента</param>
         /// <returns>Клиент, выбранный по id</returns>
-        public Client ChooseCliehtById(int id)
-        {
-            return _bank.Clients.Find(x => x.Id == id);
-        }
-        
+        public Client ChooseCliehtById(int id) => _bank.Clients.Find(x => x.Id == id);
+
+
     }
 }

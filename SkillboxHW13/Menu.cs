@@ -1,13 +1,13 @@
-﻿using System;
+﻿using BankAccountLibrary;
+using ClientsLibrary;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+
 
 namespace SkillboxHW13
 {
-    
+
     public class Menu
     {
         Bank bank;
@@ -68,18 +68,24 @@ namespace SkillboxHW13
                     case ConsoleKey.D3:
                         {
                             BankAccount temp = OpenPageBankAccounts();
-                            if (temp is not null)
+                            try
                             {
+
+                                if (temp is null)
+                                {
+                                    throw new BankAccountException();
+                                }
+
                                 manager.RemoveBankAccount(currientClient, temp); break;
                             }
-                            else 
+                            catch (BankAccountException)
                             {
                                 OpenPageWarning("Chosen account is null");
-                                menuEvent(this, "Chosen account is null");
+                                menuEvent?.Invoke(this, "Chosen account is null");
                                 break;
                             }
 
-                        } 
+                        }
                     case ConsoleKey.D4: OpenPageBalance(); break;
                     case ConsoleKey.D0: condition = false; break;
                     default: break;
@@ -103,10 +109,10 @@ namespace SkillboxHW13
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: manager.OpenNewAccount(currientClient, 1); Success(); break;
-                    case ConsoleKey.D2: manager.OpenNewAccount(currientClient, 2); Success(); break;
+                    case ConsoleKey.D1: manager.OpenNewAccount(currientClient, BankAccountTypes.Deposit); Success(); break;
+                    case ConsoleKey.D2: manager.OpenNewAccount(currientClient, BankAccountTypes.Credit); Success(); break;
                     case ConsoleKey.D0: condition = false; break;
-                    default: ; break;
+                    default:; break;
                 }
             } while (condition);
         }
@@ -156,11 +162,22 @@ namespace SkillboxHW13
                     case ConsoleKey.D2:
                         {
                             currientClient = ChooseClient(bank, manager);
-                            Console.WriteLine($"Client with id {currientClient.Id} has been chosen!\n\n");
-                            Thread.Sleep(2000);
-                            OpenPageClientAction();
-                            Console.Clear();
-                            break;
+                            try
+                            {
+                                if (currientClient is null) throw new ClientException();
+                                Console.WriteLine($"Client with id {currientClient.Id} has been chosen!\n\n");
+                                Thread.Sleep(2000);
+                                OpenPageClientAction();
+                                Console.Clear();
+                                break;
+
+                            }
+                            catch (ClientException e)
+                            {
+                                OpenPageWarning(e.Message);
+                                OpenPageStart();
+                                break;
+                            }
                         }
                     default: break;
                 }
@@ -216,6 +233,7 @@ namespace SkillboxHW13
         /// <returns>Возврат лочгического значения для дальшейшего использования</returns>
         public static bool OpenPageCapitalization()
         {
+            Console.Clear();
             Console.Write("Is deposit capitalized? y/n: ");
             ConsoleKeyInfo number = Console.ReadKey(true);
             switch (number.Key)
@@ -233,19 +251,20 @@ namespace SkillboxHW13
         {
             Console.Clear();
             Console.WriteLine(message);
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
         }
         /// <summary>
         /// Дописывает в конце строки сообщение об успесшной работе
         /// </summary>
         public static void Success()
         {
+            Console.Clear();
             Console.WriteLine("Success!");
-            Thread.Sleep(2500);
+            Thread.Sleep(500);
         }
         #endregion
 
-        
+
         /// <summary>
         /// Выдаёт одно из имен в списке
         /// </summary>
@@ -275,7 +294,7 @@ namespace SkillboxHW13
                 case 18: return "Юлия";
                 case 19: return "Сергей";
                 case 20: return "Майя";
-               default: return "";
+                default: return "";
             }
         }
         /// <summary>
@@ -285,28 +304,26 @@ namespace SkillboxHW13
         {
             try
             {
-
                 if (currientClient.BankAccounts is null)
                 {
                     throw new BankAccountException();
                 }
-                    Console.Clear();
-                    foreach (var account in currientClient.BankAccounts)
-                    {
-                        Console.WriteLine($"{account.ToString()} - id{account.Id}");
-                    }
-                    Console.WriteLine("Press any kay to continue...");
-                    Console.ReadKey();
+                Console.Clear();
+                foreach (var account in currientClient.BankAccounts)
+                {
+                    Console.WriteLine($"{account.ToString(),8} - id {account.Id}");
+                }
+                Console.WriteLine("Press any kay to continue...");
+                Console.ReadKey();
             }
             catch (BankAccountException e)
             {
                 OpenPageWarning(e.Message);
-
             }
             catch (Exception e)
             {
-                OpenPageWarning("Error! "+e.Message);
-            }            
+                OpenPageWarning("Error! " + e.Message);
+            }
         }
         /// <summary>
         /// Выводит в консоль всех клиентов данного банка
@@ -333,30 +350,24 @@ namespace SkillboxHW13
             Console.Write("\n\nWrite client's id and press Enter: ");
             int id = GetIntFromConsole();
             currientClient = manager.ChooseCliehtById(id);
-
             try
             {
-                if (currientClient is null)
-                {
-                    throw new ClientException();
-                }
-                    Console.Clear();
-                    return currientClient;
-            }
-            catch (ClientException e)
-            {
-                OpenPageWarning(e.Message);
+                if (id < 0) throw new ClientException();
+                if (currientClient is null) throw new NullReferenceException("There is no clients with this id!");
                 Console.Clear();
-                OpenPageWarning("There is no clients with this id!\nTry again...");
-                return ChooseClient(bank, manager);
+                return currientClient;
             }
-            catch(Exception e)
+            catch (ClientException)
+            {
+                Console.Clear();
+                OpenPageWarning("There is no clients\nMake at least one...");
+                return null;
+            }
+            catch (NullReferenceException e)
             {
                 OpenPageWarning(e.Message);
                 return null;
             }
-            
-            
         }
         /// <summary>
         /// Защищает ввод от нерелевантных символов
@@ -382,10 +393,23 @@ namespace SkillboxHW13
                 else Console.Write("\b \b");
 
             } while (condition);
-            
-            string s  = new(charCollection.ToArray());
-            return int.Parse(s);
+
+            string s = new(charCollection.ToArray());
+            try
+            {
+                if (s == "")
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                return int.Parse(s);
+
+            }
+            catch
+            {
+                return -1;
+            }
         }
-        
+
     }
+
 }

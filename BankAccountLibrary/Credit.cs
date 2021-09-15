@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SkillboxHW13
+namespace BankAccountLibrary
 {
     public class Credit : BankAccount
     {
@@ -20,13 +16,9 @@ namespace SkillboxHW13
             Id = CommonId++;
         }
 
-        public override void MakePayment(double payment)
-        {
-            Balance+= payment;
-        }
+        public override void MakePayment(double payment) => Balance += payment;
+        public override void TakeMoney(double payment) { }
+        public override string ToString() => "Credit";
 
-        public override void TakeMoney(double payment)
-        {
-        }
     }
 }

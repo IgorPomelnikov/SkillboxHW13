@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SkillboxHW13
+namespace BankAccountLibrary
 {
     public abstract class BankAccount
     {
@@ -15,5 +11,6 @@ namespace SkillboxHW13
         public int Id { get; protected set; }
         public abstract void MakePayment(double payment);
         public abstract void TakeMoney(double payment);
+        public abstract override string ToString();
     }
 }

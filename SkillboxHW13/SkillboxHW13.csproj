@@ -5,4 +5,15 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="BankAccounts\**" />
+    <EmbeddedResource Remove="BankAccounts\**" />
+    <None Remove="BankAccounts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BankAccountLibrary\BankAccountLibrary.csproj" />
+    <ProjectReference Include="..\ClientsLibrary\ClientsLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

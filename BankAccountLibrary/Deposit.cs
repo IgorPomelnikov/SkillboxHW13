@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SkillboxHW13
+namespace BankAccountLibrary
 {
     public class Deposit : BankAccount
     {
@@ -13,7 +10,7 @@ namespace SkillboxHW13
         public Dictionary<DateTime, double> Schedule { get; private set; }
         public Deposit(double count, double percent, int mounth, bool isCapitalized)
         {
-            Balance = Math.Round(count,2);
+            Balance = Math.Round(count, 2);
             Persent = percent;
             Capitalization = isCapitalized;
             Schedule = PaymentSсhedule(isCapitalized, mounth);
@@ -36,7 +33,7 @@ namespace SkillboxHW13
                 {
                     schedule.Add(Opened.AddMonths(i), Balance);
                 }
-                    schedule.Add(Opened.AddMonths(mounth), Balance / 100 * Persent);
+                schedule.Add(Opened.AddMonths(mounth), Balance / 100 * Persent);
             }
             else
             {
@@ -46,21 +43,14 @@ namespace SkillboxHW13
                     tempCount += tempCount / 100 * Persent;
                     schedule.Add(Opened.AddMonths(i), tempCount);
                 }
-                
+
             }
             return schedule;
         }
 
-        public override void MakePayment(double payment)
-        {
-            Balance += payment;
-        }
+        public override void MakePayment(double payment) => Balance += payment;
+        public override void TakeMoney(double payment) => Balance -= payment;
 
-        public override void TakeMoney(double payment)
-        {
-            Balance -= payment;
-        }
-
-
+        public override string ToString() => "Deposit";
     }
 }

@@ -1,10 +1,9 @@
-﻿using System;
+﻿using BankAccountLibrary;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SkillboxHW13
+
+namespace ClientsLibrary
 {
     public abstract class Client
     {
@@ -15,7 +14,7 @@ namespace SkillboxHW13
         public double DepositPercent { get; protected set; }
         public double CreditPercent { get; protected set; }
         public List<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
-        
+
         public event Action<object, string> bankAccountStatus;
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace SkillboxHW13
         {
             Deposit deposit = new(sum, percent, mounth, capitalized);
             BankAccounts.Add(deposit);
-            bankAccountStatus(this, $"New Credit (id {deposit.Id}) was created for client {Name} (id {Id})");
+            bankAccountStatus?.Invoke(this, $"New Credit (id {deposit.Id}) was created for client {Name} (id {Id})");
         }
         /// <summary>
         /// Открывает кредитный счёт и заносит новый бансковский счёт в коллекцию счетов клиента.
@@ -41,8 +40,7 @@ namespace SkillboxHW13
         {
             Credit credit = new(sum, percent, mounth);
             BankAccounts.Add(credit);
-
-            bankAccountStatus(this, $"New Credit (id {credit.Id}) was created for client {Name} (id {Id})");
+            bankAccountStatus?.Invoke(this, $"New Credit (id {credit.Id}) was created for client {Name} (id {Id})");
         }
         /// <summary>
         /// Открывает кредитный счёт
@@ -50,11 +48,7 @@ namespace SkillboxHW13
         /// <param name="client">Конкретный клиент</param>
         /// <param name="sum">Сумма, запрашиваемая клиентом</param>
         /// <param name="mounths">Срок кредитования</param>
-        public void OpenCreditAccount(Client client, double sum, int mounths)
-        {
-            this.AddCredit(sum, client.CreditPercent, mounths);
-
-        }
+        public void OpenCreditAccount(Client client, double sum, int mounths) => this.AddCredit(sum, client.CreditPercent, mounths);
         /// <summary>
         /// Открывает депозитный счёт
         /// </summary>
@@ -62,11 +56,7 @@ namespace SkillboxHW13
         /// <param name="sum">Сумма, помещающаяся на счёт</param>
         /// <param name="mounth">Срок на который открывается счёт</param>
         /// <param name="capitalized">Определение того, является ли счёт капитализированным</param>
-        public void OpenDepositAccount(Client client, double sum, int mounth, bool capitalized)
-        {
-            this.AddDeposit(sum, client.DepositPercent, mounth, capitalized);
-           
-        }
+        public void OpenDepositAccount(Client client, double sum, int mounth, bool capitalized) => this.AddDeposit(sum, client.DepositPercent, mounth, capitalized);
         /// <summary>
         /// Закрывает банковский счёт
         /// </summary>
@@ -92,16 +82,16 @@ namespace SkillboxHW13
             int index2 = BankAccounts.IndexOf(BankAccounts.Find(BankAccounts => BankAccounts.Id == toId));
             if (BankAccounts[index].Balance >= count && BankAccounts[index] is Deposit)
             {
-                    if (BankAccounts[index] is not null)
-                    {
-                        BankAccounts[index].TakeMoney(count);
-                        BankAccounts[index2].MakePayment(count);
-                    }
-                    else bankAccountStatus(this, $"A broblem with bank account id {toId}");
+                if (BankAccounts[index] is not null)
+                {
+                    BankAccounts[index].TakeMoney(count);
+                    BankAccounts[index2].MakePayment(count);
+                }
+                else bankAccountStatus(this, $"A broblem with bank account id {toId}");
             }
             else bankAccountStatus(this, $"A broblem with bank account id {fromId}");
         }
 
-       
+
     }
 }

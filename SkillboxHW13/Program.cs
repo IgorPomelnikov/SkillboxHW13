@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SkillboxHW13
+﻿namespace SkillboxHW13
 {
     class Program
     {

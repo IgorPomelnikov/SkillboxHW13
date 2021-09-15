@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkillboxHW13
+﻿namespace ClientsLibrary
 {
     public class RegularClient : Client
     {
@@ -15,6 +9,6 @@ namespace SkillboxHW13
             DepositPercent = 10;
             Id = CommonId++;
         }
-       
+
     }
 }

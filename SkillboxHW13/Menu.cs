@@ -25,7 +25,7 @@ namespace SkillboxHW13
             manager.SetClientTypeGetter(OpenPageGetClientType);
             manager.SetCapitalizationGetter(OpenPageCapitalization);
             manager.SetNameGetter(GetRandomName);
-            manager.messageFromManager += OpenPageWarning;
+            manager.sendMessageFromManager += OpenPageWarning;
         }
 
         #region Страницы меню
@@ -283,21 +283,30 @@ namespace SkillboxHW13
         /// </summary>
         void PrintClientAccounts()
         {
-            if (currientClient.BankAccounts is not null)
+            try
             {
-                Console.Clear();
-                foreach (var account in currientClient.BankAccounts)
+
+                if (currientClient.BankAccounts is null)
                 {
-                    Console.WriteLine($"{account.ToString()} - id{account.Id}");
+                    throw new BankAccountException();
                 }
-                Console.WriteLine("Press any kay to continue...");
-                Console.ReadKey();
+                    Console.Clear();
+                    foreach (var account in currientClient.BankAccounts)
+                    {
+                        Console.WriteLine($"{account.ToString()} - id{account.Id}");
+                    }
+                    Console.WriteLine("Press any kay to continue...");
+                    Console.ReadKey();
             }
-            else
+            catch (BankAccountException e)
             {
-                OpenPageWarning("This client has no bank accounts");
+                OpenPageWarning(e.Message);
+
             }
-            
+            catch (Exception e)
+            {
+                OpenPageWarning("Error! "+e.Message);
+            }            
         }
         /// <summary>
         /// Выводит в консоль всех клиентов данного банка
@@ -324,17 +333,30 @@ namespace SkillboxHW13
             Console.Write("\n\nWrite client's id and press Enter: ");
             int id = GetIntFromConsole();
             currientClient = manager.ChooseCliehtById(id);
-            if (currientClient is not null)
+
+            try
             {
-                Console.Clear();
-                return currientClient;
+                if (currientClient is null)
+                {
+                    throw new ClientException();
+                }
+                    Console.Clear();
+                    return currientClient;
             }
-            else
+            catch (ClientException e)
             {
+                OpenPageWarning(e.Message);
                 Console.Clear();
                 OpenPageWarning("There is no clients with this id!\nTry again...");
                 return ChooseClient(bank, manager);
             }
+            catch(Exception e)
+            {
+                OpenPageWarning(e.Message);
+                return null;
+            }
+            
+            
         }
         /// <summary>
         /// Защищает ввод от нерелевантных символов

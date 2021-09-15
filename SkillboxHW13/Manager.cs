@@ -72,8 +72,8 @@ namespace SkillboxHW13
         public void RegisterClient()
         {
             _bank.Clients.Add(CreateClient());
-            
-            messageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id}");
+
+            sendMessageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id}");
         }
         /// <summary>
         /// Открывает клиенту новый банковский счёт
@@ -105,7 +105,7 @@ namespace SkillboxHW13
             {
                 client.BankAccounts.Remove(bankAccount);
             }
-            else messageFromManager("Balance must be equal 0");
+            else sendMessageFromManager("Balance must be equal 0");
             
         }
         /// <summary>

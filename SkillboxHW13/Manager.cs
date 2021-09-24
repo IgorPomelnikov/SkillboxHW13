@@ -1,6 +1,8 @@
 ﻿using BankAccountLibrary;
 using ClientsLibrary;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 
@@ -10,7 +12,7 @@ namespace SkillboxHW13
     public class Manager
     {
         public string Name { get; private set; }
-
+        Random random = new Random();
         Bank _bank;
         Func<int> getMoneyValueFromUser;
         Func<int> getMouthsValueFromUser;
@@ -18,6 +20,7 @@ namespace SkillboxHW13
         Func<bool> getCapitalizationValueFromUser;
         Func<string> getNameValueFromUser;
         public event Action<string> sendMessageFromManager;
+        public event Action<string> sendAutomaticMessageFromManager;
 
 
         Client CreateClient()
@@ -30,6 +33,24 @@ namespace SkillboxHW13
                 case 3: return new EntityClient(getNameValueFromUser());
                 default: return null;
             }
+        }   
+        void AutomaticlyCreateClients()
+        {
+            var task = Task.CurrentId;
+            sendAutomaticMessageFromManager($"!!!Начато автоматическое создание клиентов--------------");
+            for (int i = 0; i < 1000000; i++)
+            {
+                switch (random.Next(1, 4))
+                {
+                    case 1: _bank.Clients.Add(new RegularClient("TestClientRegular")); break;
+                    case 2: _bank.Clients.Add(new VIPClient("TestClientVIP")); break;
+                    case 3: _bank.Clients.Add(new EntityClient("TestClientEntity")); break;
+                    default: break;
+                }
+                sendAutomaticMessageFromManager($"Task (id {Task.CurrentId}) created client {_bank.Clients[^1].Id} {_bank.Clients[^1].Name}");
+            }
+
+            sendAutomaticMessageFromManager($"!!!Завершено автоматическое создание клиентов--------------");
         }
         public Manager(Bank bank) => _bank = bank;
 
@@ -67,10 +88,22 @@ namespace SkillboxHW13
         /// <summary>
         /// Регистрирует нового клиента
         /// </summary>
-        public void RegisterClient()
+        public void RegisterClient(int mode)
         {
-            _bank.Clients.Add(CreateClient());
-            sendMessageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id}");
+            switch (mode)
+            {
+                case 1: 
+                    _bank.Clients.Add(CreateClient());
+                    sendMessageFromManager($"Manager {Name} created client {_bank.Clients[^1].Id} {_bank.Clients[^1].Name}");
+                    break;
+                case 2:
+                    var task = new Task(AutomaticlyCreateClients);
+                    task.Start(); 
+                    break;
+                default:
+                    break;
+            }
+            
         }
         /// <summary>
         /// Открывает клиенту новый банковский счёт
@@ -106,6 +139,7 @@ namespace SkillboxHW13
         /// <param name="id">Id клиента</param>
         /// <returns>Клиент, выбранный по id</returns>
         public Client ChooseCliehtById(int id) => _bank.Clients.Find(x => x.Id == id);
+
 
 
     }

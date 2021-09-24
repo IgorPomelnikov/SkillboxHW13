@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BankAccountLibrary\BankAccountLibrary.csproj" />
     <ProjectReference Include="..\ClientsLibrary\ClientsLibrary.csproj" />
+    <ProjectReference Include="..\Logger\Loger.csproj" />
   </ItemGroup>
 
 </Project>

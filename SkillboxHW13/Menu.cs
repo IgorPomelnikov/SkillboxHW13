@@ -14,7 +14,7 @@ namespace SkillboxHW13
         Manager manager;
         Client currientClient;
         Random random = new Random();
-        public event Action<object, string> menuEvent;
+        public static event Action<string> menuEvent;
 
         public Menu(Bank bank, Manager manager)
         {
@@ -26,6 +26,7 @@ namespace SkillboxHW13
             manager.SetCapitalizationGetter(OpenPageCapitalization);
             manager.SetNameGetter(GetRandomName);
             manager.sendMessageFromManager += OpenPageWarning;
+            
         }
 
         #region Страницы меню
@@ -34,6 +35,7 @@ namespace SkillboxHW13
         /// </summary>
         void OpenPageBalance()
         {
+            menuEvent?.Invoke("Открыта страница просмотра баланса");
             BankAccount bankAccount = OpenPageBankAccounts();
             Console.Clear();
             if (bankAccount is not null)
@@ -52,7 +54,7 @@ namespace SkillboxHW13
             bool condition = true;
             do
             {
-
+                menuEvent?.Invoke("Открыта страница выбора действия с клиентом");
                 Console.Clear();
                 Console.WriteLine("What would you like to do?\n" +
                                   "1) Look all bank accounts\n" +
@@ -63,30 +65,38 @@ namespace SkillboxHW13
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: PrintClientAccounts(); break;
-                    case ConsoleKey.D2: OpenPageCreateAccount(); break;
+                    case ConsoleKey.D1: 
+                        PrintClientAccounts(); 
+                        break;
+                    case ConsoleKey.D2: 
+                        OpenPageCreateAccount(); 
+                        break;
                     case ConsoleKey.D3:
+                        BankAccount temp = OpenPageBankAccounts();
+                        try
                         {
-                            BankAccount temp = OpenPageBankAccounts();
-                            try
-                            {
 
-                                if (temp is null)
-                                {
-                                    throw new BankAccountException();
-                                }
-
-                                manager.RemoveBankAccount(currientClient, temp); break;
-                            }
-                            catch (BankAccountException)
+                            if (temp is null)
                             {
-                                OpenPageWarning("Chosen account is null");
-                                menuEvent?.Invoke(this, "Chosen account is null");
-                                break;
+                                throw new BankAccountException();
                             }
 
+                            manager.RemoveBankAccount(currientClient, temp);
+                            menuEvent?.Invoke("");
+                            break;
                         }
-                    case ConsoleKey.D4: OpenPageBalance(); break;
+                        catch (BankAccountException)
+                        {
+                            OpenPageWarning("Chosen account is null");
+                            menuEvent?.Invoke("Ошибка. Выбранный аккаунт равен null");
+                            break;
+                        }
+
+                    case ConsoleKey.D4: 
+                        OpenPageBalance(); 
+                        menuEvent?.Invoke("Открыта страница просмотра баланса"); 
+                        break;
+
                     case ConsoleKey.D0: condition = false; break;
                     default: break;
                 }
@@ -100,6 +110,7 @@ namespace SkillboxHW13
             bool condition = true;
             do
             {
+                menuEvent?.Invoke("Открыта страница создания аккаунта");
 
                 Console.Clear();
                 Console.WriteLine("What account would you like to open?\n" +
@@ -109,9 +120,17 @@ namespace SkillboxHW13
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: manager.OpenNewAccount(currientClient, BankAccountTypes.Deposit); Success(); break;
-                    case ConsoleKey.D2: manager.OpenNewAccount(currientClient, BankAccountTypes.Credit); Success(); break;
-                    case ConsoleKey.D0: condition = false; break;
+                    case ConsoleKey.D1: 
+                        menuEvent?.Invoke("Создание депозитного счёта");
+                        manager.OpenNewAccount(currientClient, BankAccountTypes.Deposit);
+                        Success(); break;
+                    case ConsoleKey.D2:
+                        menuEvent?.Invoke("Создание кредитного счёта");
+                        manager.OpenNewAccount(currientClient, BankAccountTypes.Credit); 
+                        Success(); break;
+                    case ConsoleKey.D0: 
+                        condition = false;                       
+                        break;
                     default:; break;
                 }
             } while (condition);
@@ -122,6 +141,7 @@ namespace SkillboxHW13
         /// <returns>Выбранный банковсий счёт</returns>
         BankAccount OpenPageBankAccounts()
         {
+            menuEvent?.Invoke("Открыта страница выбора банковского счёта");
             Console.Clear();
             if (currientClient.BankAccounts is not null)
             {
@@ -129,7 +149,7 @@ namespace SkillboxHW13
             }
             else
             {
-                Console.WriteLine("This client has no bank accounts");
+                OpenPageWarning("This client has no bank accounts");
                 return null;
             }
             Console.Write("\n\nType id of account what you need: ");
@@ -151,14 +171,16 @@ namespace SkillboxHW13
         {
             while (true)
             {
+                menuEvent?.Invoke("Открыта начальная страница");
                 Console.Clear();
                 Console.WriteLine("What would you like to do?\n" +
                                   "1) Register a new client\n" +
-                                  "2) Choose a client ");
+                                  "2) Choose a client\n" +
+                                  "3) Auto mode of creation 1 000 000 clients with deposits\n"); 
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: manager.RegisterClient(); Success(); break;
+                    case ConsoleKey.D1: manager.RegisterClient(1); Success(); break;
                     case ConsoleKey.D2:
                         {
                             currientClient = ChooseClient(bank, manager);
@@ -179,6 +201,7 @@ namespace SkillboxHW13
                                 break;
                             }
                         }
+                    case ConsoleKey.D3: manager.RegisterClient(2); OpenPageWarning("Производится автоматическое создание клинетов в фоновом режиме"); break;
                     default: break;
                 }
 
@@ -190,6 +213,7 @@ namespace SkillboxHW13
         /// <returns>Целое число</returns>
         public static int OpenPageMoney()
         {
+            menuEvent?.Invoke("Открыта страница ввода суммы");
             Console.Clear();
             Console.Write("Type count of money and press Enter: ");
             return GetIntFromConsole();
@@ -200,6 +224,7 @@ namespace SkillboxHW13
         /// <returns>Целое число</returns>
         public static int OpenPageMounths()
         {
+            menuEvent?.Invoke("Открыта страница выбора количества месяцев");
             Console.Clear();
             Console.Write("Type count of mounths and press Enter: ");
             return GetIntFromConsole();
@@ -210,6 +235,7 @@ namespace SkillboxHW13
         /// <returns>Возврат числа от 1 до 3 для дальшейшего использования в качестве переключателя swich</returns>
         public static int OpenPageGetClientType()
         {
+            menuEvent?.Invoke("Открыта страница выбора типа клиента");
             Console.Clear();
             Console.WriteLine("Chose a kind of a client:\n" +
                               "1) Regular client\n" +
@@ -220,9 +246,9 @@ namespace SkillboxHW13
                 ConsoleKeyInfo number = Console.ReadKey(true);
                 switch (number.Key)
                 {
-                    case ConsoleKey.D1: return 1;
-                    case ConsoleKey.D2: return 2;
-                    case ConsoleKey.D3: return 3;
+                    case ConsoleKey.D1: menuEvent?.Invoke("Выбран клиент Regular"); return 1;
+                    case ConsoleKey.D2: menuEvent?.Invoke("Выбран клиент VIP"); return 2;
+                    case ConsoleKey.D3: menuEvent?.Invoke("Выбран клиент Entity"); return 3;
                     default: Console.Write("\b"); break;
                 }
             }
@@ -233,13 +259,14 @@ namespace SkillboxHW13
         /// <returns>Возврат лочгического значения для дальшейшего использования</returns>
         public static bool OpenPageCapitalization()
         {
+            menuEvent?.Invoke("Открыта страница выбора капитализации");
             Console.Clear();
             Console.Write("Is deposit capitalized? y/n: ");
             ConsoleKeyInfo number = Console.ReadKey(true);
             switch (number.Key)
             {
-                case ConsoleKey.Y: return true;
-                case ConsoleKey.N: return false;
+                case ConsoleKey.Y: menuEvent?.Invoke("Установлен параметр капитализации в true"); return true;
+                case ConsoleKey.N: menuEvent?.Invoke("Установлен параметр капитализации в false"); return false;
                 default: Console.Write("\b"); return OpenPageCapitalization();
             }
         }
@@ -249,6 +276,7 @@ namespace SkillboxHW13
         /// <param name="message">Сообщение ошибки</param>
         public static void OpenPageWarning(string message)
         {
+            menuEvent?.Invoke(message);
             Console.Clear();
             Console.WriteLine(message);
             Thread.Sleep(1000);
@@ -259,11 +287,15 @@ namespace SkillboxHW13
         public static void Success()
         {
             Console.Clear();
+            menuEvent?.Invoke("Успех!");
             Console.WriteLine("Success!");
-            Thread.Sleep(500);
         }
         #endregion
 
+        public void SubscribeOnMenuEvents(Action<string> logWriter)
+        {
+            menuEvent += logWriter;
+        }
 
         /// <summary>
         /// Выдаёт одно из имен в списке
@@ -272,36 +304,40 @@ namespace SkillboxHW13
         string GetRandomName()
         {
             int numerOfRandomName = random.Next(1, 21);
+            string randomName = "";
             switch (numerOfRandomName)
             {
-                case 1: return "Виктория";
-                case 2: return "Пётр";
-                case 3: return "Анна";
-                case 4: return "Алексей";
-                case 5: return "Али";
-                case 6: return "Мария";
-                case 7: return "Глеб";
-                case 8: return "Тамара";
-                case 9: return "Виктор";
-                case 10: return "Евгения";
-                case 11: return "Евгений";
-                case 12: return "Мартина";
-                case 13: return "Антон";
-                case 14: return "Ксения";
-                case 15: return "Георг";
-                case 16: return "Ольга";
-                case 17: return "Максим";
-                case 18: return "Юлия";
-                case 19: return "Сергей";
-                case 20: return "Майя";
-                default: return "";
+                case 1: randomName = "Виктория"; break;
+                case 2: randomName =  "Пётр"; break;
+                case 3: randomName =  "Анна"; break;
+                case 4: randomName =  "Алексей"; break;
+                case 5: randomName =  "Али"; break;
+                case 6: randomName =  "Мария"; break;
+                case 7: randomName =  "Глеб"; break;
+                case 8: randomName =  "Тамара"; break;
+                case 9: randomName =  "Виктор"; break;
+                case 10: randomName =  "Евгения"; break;
+                case 11: randomName =  "Евгений"; break;
+                case 12: randomName =  "Мартина"; break;
+                case 13: randomName =  "Антон"; break;
+                case 14: randomName =  "Ксения"; break;
+                case 15: randomName =  "Георг"; break;
+                case 16: randomName =  "Ольга"; break;
+                case 17: randomName =  "Максим"; break;
+                case 18: randomName =  "Юлия"; break;
+                case 19: randomName =  "Сергей"; break;
+                case 20: randomName =  "Майя"; break;
+                default: randomName =  ""; break;
             }
+            menuEvent?.Invoke($"Выдано случайное имя ({randomName})пользователю");
+            return randomName;
         }
         /// <summary>
         /// Выводит в консоль список счетов клиента
         /// </summary>
         void PrintClientAccounts()
         {
+            menuEvent?.Invoke("Вывод в консоль список аккаунтов клиентов");
             try
             {
                 if (currientClient.BankAccounts is null)
@@ -331,9 +367,13 @@ namespace SkillboxHW13
         /// <param name="bank">Банк с которым производится работа</param>
         void PrintAllClients(Bank bank)
         {
-            foreach (var client in bank.Clients)
+            //    foreach (var client in bank.Clients)
+            //    {
+            //        Console.WriteLine($"{client.Id} client.Name");
+            //    }
+            for (int i = 0; i < bank.Clients.Count; i++)
             {
-                Console.WriteLine($"{client.Id}");
+                Console.WriteLine($"{bank.Clients[i].Id} {bank.Clients[i].Name} ");
             }
         }
         /// <summary>
@@ -344,6 +384,7 @@ namespace SkillboxHW13
         /// <returns></returns>
         Client ChooseClient(Bank bank, Manager manager)
         {
+            menuEvent?.Invoke("Начат процесс выбора клиента");
             Client currientClient;
             Console.Clear();
             PrintAllClients(bank);
@@ -353,14 +394,14 @@ namespace SkillboxHW13
             try
             {
                 if (id < 0) throw new ClientException();
-                if (currientClient is null) throw new NullReferenceException("There is no clients with this id!");
+                if (currientClient is null) throw new NullReferenceException("There is no clients with this id!"); 
                 Console.Clear();
                 return currientClient;
             }
             catch (ClientException)
             {
                 Console.Clear();
-                OpenPageWarning("There is no clients\nMake at least one...");
+                OpenPageWarning("There is no clients!");
                 return null;
             }
             catch (NullReferenceException e)
@@ -375,12 +416,12 @@ namespace SkillboxHW13
         /// <returns>Целое число</returns>
         static int GetIntFromConsole()
         {
+            menuEvent?.Invoke("Начат процесс ввода числа из консоли");
             bool condition = true;
             List<char> charCollection = new List<char>();
             do
             {
                 ConsoleKeyInfo kay = Console.ReadKey();
-
                 char number = kay.KeyChar;
                 if (char.IsNumber(number))
                 {
@@ -391,7 +432,6 @@ namespace SkillboxHW13
                     condition = false;
                 }
                 else Console.Write("\b \b");
-
             } while (condition);
 
             string s = new(charCollection.ToArray());
@@ -401,15 +441,14 @@ namespace SkillboxHW13
                 {
                     throw new IndexOutOfRangeException();
                 }
+                menuEvent?.Invoke("Выбрано число "+s);
                 return int.Parse(s);
-
             }
             catch
             {
+                menuEvent?.Invoke("Ошибка, результат -1");
                 return -1;
             }
         }
-
     }
-
 }

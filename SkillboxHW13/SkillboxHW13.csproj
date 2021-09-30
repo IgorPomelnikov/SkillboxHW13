@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BankAccountLibrary\BankAccountLibrary.csproj" />
     <ProjectReference Include="..\ClientsLibrary\ClientsLibrary.csproj" />
     <ProjectReference Include="..\Logger\Loger.csproj" />

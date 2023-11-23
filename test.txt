@@ -1,3 +1,5 @@
 this is a new test file
 
 now i am testing automation
+
+lorem ipsum
